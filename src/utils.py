@@ -1,6 +1,6 @@
-import json
 import logging
 import os
+import numpy as np
 
 import pandas as pd
 
@@ -31,44 +31,40 @@ def setup_logger(name: str) -> logging.Logger:
 logger = setup_logger("utils")
 
 
-def read_data_transactions(file_path: str) -> list[dict]:
+def read_data_transactions(file_path: str) -> pd.DataFrame:
     """
     ## Возвращает список словарей из JSON/CSV/XLSX
     Аргументы:
         `file_path (str)`: Путь к JSON/CSV/XLSX-файлу
     Возвращает:
-        `list`: список словарей
+        `DataFrame`: С колонками и рядами
     """
+    print(file_path)
     if not os.path.exists(file_path):
         logger.warning(f"Файл {file_path} не найден")
-        return []
+        raise FileNotFoundError(f"Файл {file_path} не найден")
 
     if file_path.endswith(".json"):
-        with open(file_path, "r", encoding="utf-8") as file:
-            try:
-                data = json.load(file)
-                if isinstance(data, list):
-                    logger.info(f"Файл {file_path} успешно загружен")
-                    return data
-
-                else:
-                    logger.error(f"Файл {file_path} должен содержать список")
-                    return []
-
-            except json.JSONDecodeError:
-                logger.error(f"Файл {file_path} содержит некорректные данные")
-                return []
+        return pd.read_json(file_path)
 
     elif file_path.endswith(".csv"):
-        df = pd.read_csv(file_path, delimiter=";")
-        logger.info(f"Файл {file_path} успешно загружен")
-        return df.to_dict("records")
+        return pd.read_csv(file_path, delimiter=";").replace({np.nan: None})
 
-    elif file_path.endswith(".xlsx") or file_path.endswith(".xls"):
-        df = pd.read_excel(file_path)
-        logger.info(f"Файл {file_path} успешно загружен")
-        return df.to_dict("records")
-
+    elif file_path.endswith(".xls") or file_path.endswith(".xlsx"):
+        return pd.read_excel(file_path).replace({np.nan: None})
+    
     else:
-        logger.error(f"Неподдерживаемый формат файла {file_path}")
-        return []
+        logger.warning(f"Файл {file_path} не поддерживается")
+        raise NotImplementedError(f"Файл {file_path} не поддерживается")
+    
+
+def get_json_from_dataframe(df: pd.DataFrame) -> list[dict]:
+    """
+    ## Возвращает список словарей из JSON-файла
+    Аргументы:
+        `file_path (str)`: Путь к JSON-файлу
+    Возвращает:
+        `list[dict]`: Список словарей
+    """
+    # return read_data_transactions(file_path).replace({np.nan: None}).to_dict('records')
+    return df.to_dict('records')
