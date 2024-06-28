@@ -6,7 +6,7 @@ from collections import defaultdict
 from typing import Literal
 import requests
 
-from utils import get_json_from_dataframe, read_data_transactions, setup_logger
+from src.utils import get_json_from_dataframe, read_data_transactions, setup_logger
 
 dotenv.load_dotenv()
 
@@ -194,10 +194,10 @@ def get_currency_stocks(file_path: str = "user_settings.json") -> tuple[list, li
         `tuple[list, list]`: список курсов валют и список цен акций
     """
 
-    with open(file_path, "r", encoding="utf8") as user_file:
-        user_settings = json.load(user_file)
-        user_currencies = user_settings["user_currencies"]
-        user_stocks = user_settings["user_stocks"]
+
+    user_settings = read_user_settings(file_path)
+    user_currencies = user_settings["user_currencies"]
+    user_stocks = user_settings["user_stocks"]
 
     currency_list = []
     stocks_list = []
@@ -251,8 +251,7 @@ def get_stock_price(stock: str) -> None | float:
 
     return result
 
-
-
-
-if __name__ == "__main__":
-    print(post_events_response("22.05.2020", "W"))
+def read_user_settings(filepath):
+    with open(filepath, 'r') as f:
+        user_settings = json.load(f)
+    return user_settings
