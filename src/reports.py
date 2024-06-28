@@ -6,7 +6,7 @@ import pandas as pd
 def spending_by_category(transactions: pd.DataFrame, category: str, date: str | None = None) -> pd.DataFrame:
     """
     Функция возвращает траты по заданной категории за последние три месяца (от переданной даты)
-    
+
     Аргументы:
         `transactions` (pd.DataFrame): DataFrame с транзакциями
         `category` (str): Категория трат

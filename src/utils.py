@@ -1,7 +1,8 @@
 import logging
 import os
-import numpy as np
+from typing import Any
 
+import numpy as np
 import pandas as pd
 
 
@@ -52,19 +53,19 @@ def read_data_transactions(file_path: str) -> pd.DataFrame:
 
     elif file_path.endswith(".xls") or file_path.endswith(".xlsx"):
         return pd.read_excel(file_path).replace({np.nan: None})
-    
+
     else:
         logger.warning(f"Файл {file_path} не поддерживается")
         raise NotImplementedError(f"Файл {file_path} не поддерживается")
-    
 
-def get_json_from_dataframe(df: pd.DataFrame) -> list[dict]:
+
+def get_json_from_dataframe(df: pd.DataFrame) -> list[dict[Any, Any]]:
     """
     ## Возвращает список словарей из JSON-файла
     Аргументы:
         `file_path (str)`: Путь к JSON-файлу
     Возвращает:
-        `list[dict]`: Список словарей
+        `list[dict[Any, Any]]`: Список словарей
     """
     # return read_data_transactions(file_path).replace({np.nan: None}).to_dict('records')
-    return df.to_dict('records')
+    return df.to_dict("records")

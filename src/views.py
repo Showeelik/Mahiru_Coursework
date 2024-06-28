@@ -1,9 +1,10 @@
 import datetime
 import json
 import os
-import dotenv
 from collections import defaultdict
-from typing import Literal
+from typing import Any, Literal
+
+import dotenv
 import requests
 
 from src.utils import get_json_from_dataframe, read_data_transactions, setup_logger
@@ -11,6 +12,7 @@ from src.utils import get_json_from_dataframe, read_data_transactions, setup_log
 dotenv.load_dotenv()
 
 logger = setup_logger("views")
+
 
 def post_events_response(date: str, optional_flag: Literal["M", "W", "Y", "ALL"] = "M") -> dict:
     """
@@ -20,8 +22,8 @@ def post_events_response(date: str, optional_flag: Literal["M", "W", "Y", "ALL"]
 
     Аргументы:
         `date` (str): Дата в формате DD.MM.YYYY
-        `optional_flag` (str) = "M": Отображение операций за месяц/неделю/год/всё(по умолчанию месяц) время(до введенной даты)
-    
+        `optional_flag` (str) = "M": Отображение операций за месяц/неделю/год/всё время(до введенной даты)
+
     Возвращает:
         `dict`: JSON ответ с данными
     """
@@ -41,11 +43,11 @@ def post_events_response(date: str, optional_flag: Literal["M", "W", "Y", "ALL"]
 def get_operations_by_date_range(date: str, optional_flag: str = "M") -> list[dict]:
     """
     Функция для фильтрации данных об операциях по дате.
-    
+
     Аргументы:
         `date` (str): Дата в формате DD.MM.YYYY
-        `optional_flag` (str): 
-    
+        `optional_flag` (str):
+
     Возвращает:
         `list[dict]`: Список словарей с операциями
     """
@@ -92,10 +94,10 @@ def get_expences_categories(expences_categories: dict) -> dict:
     Функция принимает на вход словарь с тратами по всем категориям, сортирует по убыванию,
     оставляет только 7 категорий, где были самые значительные траты. Все остальные траты
     помещает в категорию "Остальное".
-    
+
     Аргументы:
         `expences_categories` (dict): словарь с тратами по категориям
-    
+
     Возвращает:
         `dict`: словарь с тратами по категориям
     """
@@ -134,7 +136,7 @@ def get_expences_categories(expences_categories: dict) -> dict:
 def get_income_categories(income_categories: dict) -> dict:
     """
     Функция принимает на вход словарь с поступлениями по всем категориям, сортирует по убыванию.
-    
+
     Аргументы:
         `income_categories` (dict): словарь с поступлениями. `{Категория(str): Поступление(int)}`.
     Возвращает:
@@ -159,7 +161,7 @@ def get_income_categories(income_categories: dict) -> dict:
 def get_expences_income(operations: list[dict]) -> tuple[dict, dict]:
     """
     Функция принимает на вход список словарей с данными о всех отсортированных по дате операциях.
-    
+
     Аргументы:
         `operations` (list[dict]): список словарей с данными о всех операциях
     Возвращает:
@@ -187,13 +189,12 @@ def get_expences_income(operations: list[dict]) -> tuple[dict, dict]:
 def get_currency_stocks(file_path: str = "user_settings.json") -> tuple[list, list]:
     """
     Функция для определения курса валюты и цены акций, указанных в file_path настройках.
-    
+
     Аргументы:
         `file_path` (str): путь к файлу с настройками
     Возвращает:
         `tuple[list, list]`: список курсов валют и список цен акций
     """
-
 
     user_settings = read_user_settings(file_path)
     user_currencies = user_settings["user_currencies"]
@@ -216,42 +217,43 @@ def get_currency_stocks(file_path: str = "user_settings.json") -> tuple[list, li
 def get_currency_price(currency: str) -> None | float:
     """
     Функция для обращения по API запросу для получения цены валюты в рублёвом еквиваленте
-    
+
     Аргументы:
         `currency` (str): код валюты
     Возвращает:
         `float` или `None`: курс валюты в рублях или `None` в случае ошибки
     """
-    response = requests.get(f'https://api.exchangerate-api.com/v4/latest/{currency}')
+    response = requests.get(f"https://api.exchangerate-api.com/v4/latest/{currency}")
     if response.status_code != 200:
         return None
 
-    result: float | None = response.json()['rates'].get('RUB', None)
+    result: float | None = response.json()["rates"].get("RUB", None)
     return result
 
 
 def get_stock_price(stock: str) -> None | float:
     """
     Функция получает цену акции в долларах по коду.
-    
+
     Аргументы:
         `stock` (str): код акции
     Возвращает:
         `float` или `None`: цена акции в долларах или `None` в случае ошибки
     """
-    
+
     API_KEY = os.getenv("FMP_API_KEY")
 
-    response = requests.get(f'https://financialmodelingprep.com/api/v3/quote/{stock}?apikey={API_KEY}')
+    response = requests.get(f"https://financialmodelingprep.com/api/v3/quote/{stock}?apikey={API_KEY}")
 
     if response.status_code != 200:
         return None
 
-    result: float | None = response.json()[0]['price']
+    result: float | None = response.json()[0]["price"]
 
     return result
 
-def read_user_settings(filepath):
-    with open(filepath, 'r') as f:
+
+def read_user_settings(filepath: str) -> Any:
+    with open(filepath, "r") as f:
         user_settings = json.load(f)
     return user_settings

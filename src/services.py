@@ -1,6 +1,6 @@
 import re
 
-from src.utils import read_data_transactions, get_json_from_dataframe, setup_logger
+from src.utils import get_json_from_dataframe, read_data_transactions, setup_logger
 
 logger = setup_logger("services")
 
@@ -56,6 +56,7 @@ def search_by_persons(file_path: str = "data/operations.xls") -> list[dict]:
     logger.debug(f"Найдено совпадений: {len(tmp)}")
 
     return tmp
+
 
 if __name__ == "__main__":
     print(simple_searching("колхоз"))
