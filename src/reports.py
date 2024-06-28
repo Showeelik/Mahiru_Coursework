@@ -2,6 +2,10 @@ import datetime
 
 import pandas as pd
 
+from src.utils import setup_logger
+
+logger = setup_logger("reports")
+
 
 def spending_by_category(transactions: pd.DataFrame, category: str, date: str | None = None) -> pd.DataFrame:
     """
@@ -34,4 +38,5 @@ def spending_by_category(transactions: pd.DataFrame, category: str, date: str | 
     filtered_df = df.loc[df["Дата операции"].between(left_date.strftime("%Y-%m-%d"), right_date.strftime("%Y-%m-%d"))]
     filtered_df = filtered_df.loc[df["Категория"] == category]
 
+    logger.info(f"расходы по категориям: {filtered_df}")
     return filtered_df

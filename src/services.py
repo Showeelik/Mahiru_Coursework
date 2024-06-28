@@ -26,7 +26,7 @@ def simple_searching(search_field: str, file_path: str = "data/operations.xls") 
         if search_field in op_category.lower() or search_field in op_descr.lower():
             tmp.append(op)
 
-    logger.debug(f"В поиск передано: {search_field}. Найдено совпадений: {len(tmp)}")
+    logger.info(f"В поиск передано: {search_field}. Найдено совпадений: {len(tmp)}")
 
     return tmp
 
@@ -53,7 +53,7 @@ def search_by_persons(file_path: str = "data/operations.xls") -> list[dict]:
         if result:
             tmp.append(op)
 
-    logger.debug(f"Найдено совпадений: {len(tmp)}")
+    logger.info(f"Найдено совпадений: {len(tmp)}")
 
     return tmp
 
